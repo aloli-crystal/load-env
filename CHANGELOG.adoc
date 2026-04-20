@@ -1,0 +1,26 @@
+= Changelog
+:toc: left
+:toclevels: 2
+
+Toutes les modifications notables de ce projet sont documentées dans ce fichier.
+
+Le format s'inspire de https://keepachangelog.com/fr/1.1.0/[Keep a Changelog]
+et ce projet suit https://semver.org/lang/fr/[Semantic Versioning].
+
+== 0.1.0 (20 avril 2026)
+
+=== Ajouté
+
+* `LoadEnv.load(path = ".env", overwrite = false)` : charge un fichier
+  `.env` dans `ENV`. Silencieux si le fichier est absent. Préserve par
+  défaut les variables déjà exportées (convention : le shell l'emporte
+  sur le fichier).
+* `LoadEnv.parse(content)` : parse un contenu `.env` en
+  `Hash(String, String)` sans toucher `ENV` (utile en tests).
+* Parse les formats `KEY=VALUE`, `KEY="..."` (avec déséchappement
+  bash-like `\n`, `\r`, `\t`, `\"`, `\\`), `KEY='...'` (littéral),
+  `export KEY=...`. Ignore les commentaires `#` et les lignes vides.
+* Sur valeurs non quotées, retire un commentaire de fin de ligne
+  précédé d'un espace (`FOO=bar # note`).
+* CI GitHub Actions : format + specs Linux et FreeBSD 15.
+* Licence MIT, auteur ALOLI sas.

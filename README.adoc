@@ -1,0 +1,93 @@
+= load-env
+:toc: left
+:toclevels: 2
+
+Chargeur `.env` Crystal pur, zéro dépendance externe.
+
+image:https://github.com/aloli-crystal/crystal-load-env/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/aloli-crystal/crystal-load-env/actions/workflows/ci.yml]
+
+== Pourquoi
+
+Dispense l'utilisateur final du rituel `set -a && source .env && set +a`
+avant chaque invocation d'un CLI Crystal qui lit ses secrets/config dans
+`ENV`. Un simple `LoadEnv.load` au démarrage suffit.
+
+Principes :
+
+* Crystal pur, stdlib uniquement, aucun shard externe.
+* Ne remplace pas les variables d'environnement déjà posées par défaut
+  (ce qui est explicite dans le shell l'emporte).
+* Parse les formats usuels : `KEY=VALUE`, `KEY="..."`, `KEY='...'`,
+  `export KEY=...`, commentaires `#`, lignes vides, valeurs vides.
+
+== Installation
+
+[source,yaml]
+----
+dependencies:
+  load-env:
+    github: aloli-crystal/crystal-load-env
+    version: ~> 0.1
+----
+
+== Usage
+
+[source,crystal]
+----
+require "load-env"
+
+# Charge `.env` dans le répertoire courant (silencieux si absent).
+LoadEnv.load
+
+# Autre chemin :
+LoadEnv.load(".env.prod")
+
+# Écrase les variables déjà présentes dans ENV :
+LoadEnv.load(overwrite: true)
+
+# Parse sans toucher ENV (utile en tests) :
+LoadEnv.parse(File.read(".env"))  # => Hash(String, String)
+----
+
+== Format reconnu
+
+[source]
+----
+# Commentaire, ignoré
+BASIC=valeur
+QUOTED="avec espaces et \n échappé"
+LITERAL='pas d\'échappement ici'
+export COMPAT_BASH=oui
+AVEC_EGAL=secret=abc=123
+VIDE=
+TRAILING=bar # commentaire en fin de ligne
+----
+
+== Licence
+
+MIT, © 2026 ALOLI sas.
+
+---
+
+= load-env (English)
+
+A minimal, pure-Crystal `.env` loader. No external shards.
+
+Spares your CLI users the `set -a && source .env && set +a` ritual before
+every invocation — one `LoadEnv.load` at startup does the job.
+
+Environment variables already set in the shell take precedence over the
+file (use `overwrite: true` to invert). Supports `KEY=VALUE`,
+`KEY="..."`, `KEY='...'`, `export KEY=...`, comments, blank lines.
+
+[source,crystal]
+----
+require "load-env"
+
+LoadEnv.load                     # load `.env` from cwd, silent if missing
+LoadEnv.load(".env.prod")        # other path
+LoadEnv.load(overwrite: true)    # override existing ENV values
+LoadEnv.parse(File.read(".env")) # parse without touching ENV
+----
+
+MIT licence, © 2026 ALOLI sas.
