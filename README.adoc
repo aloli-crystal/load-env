@@ -4,7 +4,7 @@
 
 Chargeur `.env` Crystal pur, zéro dépendance externe.
 
-image:https://github.com/aloli-crystal/crystal-load-env/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/aloli-crystal/crystal-load-env/actions/workflows/ci.yml]
+image:https://github.com/aloli-crystal/load-env/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/aloli-crystal/load-env/actions/workflows/ci.yml]
 
 == Pourquoi
 
@@ -26,7 +26,7 @@ Principes :
 ----
 dependencies:
   load-env:
-    github: aloli-crystal/crystal-load-env
+    github: aloli-crystal/load-env
     version: ~> 0.1
 ----
 
