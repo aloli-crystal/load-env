@@ -1,11 +1,13 @@
 name: load-env
-version: 0.1.1
+version: 0.2.0
 
 description: >
   Chargeur `.env` Crystal pur (zéro dépendance externe). Parse les formats
   usuels KEY=VALUE / KEY="…" / KEY='…' / export KEY=…, ignore commentaires
   et lignes vides, pose les variables dans ENV sans écraser par défaut.
-  Convenu pour les CLI Crystal qui veulent éviter à l'utilisateur le rituel
+  Logue le chargement (chemin + compteurs) sans jamais émettre les clés
+  ni les valeurs (pas de fuite de secret en logs). Convenu pour les CLI
+  Crystal qui veulent éviter à l'utilisateur le rituel
   `set -a && source .env && set +a` avant chaque invocation.
 
 authors:

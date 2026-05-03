@@ -7,11 +7,33 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format s'inspire de https://keepachangelog.com/fr/1.1.0/[Keep a Changelog]
 et ce projet suit https://semver.org/lang/fr/[Semantic Versioning].
 
+== 0.2.0 (3 mai 2026)
+
+=== Ajouté
+
+* `LoadEnv.load` émet désormais une ligne `INFO` à chaque chargement
+  réussi : chemin résolu (absolu), nombre de variables posées, nombre
+  ignorées (déjà présentes dans `ENV` ou skippées par `overwrite: false`).
+  *Ni clés ni valeurs* — pas de fuite de secret dans les journaux.
+* Une ligne `WARN` est émise quand le chemin demandé n'existe pas
+  (avant : silence total). Pratique pour repérer un mauvais cwd ou un
+  `.env` oublié — cas vécu : un wrapper rc.d qui ne fait pas `cd` avant
+  d'`exec` le binaire, le `.env` est invisible et l'app retombe sur les
+  défauts sans rien dire.
+* Nouveau paramètre `quiet: Bool = false` sur `load` pour couper tous
+  les logs (utile en tests ou pour les chargements multiples
+  consécutifs où le bruit n'apporte rien).
+
+=== Migration depuis 0.1.x
+
+Aucun changement de comportement runtime. Si vous utilisiez `LoadEnv`
+dans un test et que la sortie de log vous gêne, passez `quiet: true`.
+
 == 0.1.1 (29 avril 2026)
 
 === Modifié
 
-* **Repo GitHub renommé** `aloli-crystal/crystal-load-env` → `aloli-crystal/load-env`
+* **Repo GitHub renommé** `aloli-crystal/load-env` → `aloli-crystal/load-env`
   (convention de nommage Aloli : créations sans préfixe `crystal-`).
   Les anciens liens redirigent automatiquement.
 

@@ -1,3 +1,5 @@
+require "log"
+
 require "./load-env/version"
 
 # Chargeur `.env` minimaliste, Crystal pur, zéro dépendance externe.
@@ -10,32 +12,58 @@ require "./load-env/version"
 # Usage typique au démarrage d'un CLI :
 #
 #     require "load-env"
-#     LoadEnv.load              # charge `.env` dans le cwd, silencieux si absent
+#     LoadEnv.load              # charge `.env` dans le cwd
 #     LoadEnv.load(".env.prod") # autre chemin
 #     LoadEnv.load(overwrite: true)
+#     LoadEnv.load(quiet: true) # n'émet aucun log
 #
 # Les valeurs entre guillemets conservent leurs espaces internes ; les
 # séquences `\n`, `\r`, `\t`, `\\`, `\"` sont déséchappées dans les
 # chaînes à guillemets doubles (bash-like). Les guillemets simples sont
 # littéraux. Un commentaire de fin de ligne (précédé d'un espace) est
 # retiré sur les valeurs non quotées (`FOO=bar # note`).
+#
+# Logging :
+#
+# * `INFO` à chaque chargement réussi : chemin résolu (absolu), nombre
+#   de variables posées, nombre laissées de côté (déjà présentes dans
+#   ENV ou skippées par `overwrite: false`). *Aucune clé ni valeur* —
+#   pas de fuite de secret dans les journaux.
+# * `WARN` si le chemin demandé n'existe pas — pratique pour repérer
+#   un mauvais cwd ou un .env oublié (cas vécu : un wrapper rc.d qui
+#   ne fait pas `cd` avant d'`exec` le binaire, le .env est invisible).
+# * Silencieux complet via `quiet: true` (tests, chargements multiples).
 module LoadEnv
-  # Charge un fichier `.env` dans `ENV` (silencieux si absent).
+  Log = ::Log.for(self)
+
+  # Charge un fichier `.env` dans `ENV`.
   #
   # `overwrite: false` (défaut) : n'écrase pas les variables déjà
   # présentes dans `ENV`. Convention : ce qui est explicitement exporté
   # avant d'invoquer le programme l'emporte sur le fichier.
   #
+  # `quiet: false` (défaut) : émet une ligne `INFO` au succès, `WARN`
+  # si fichier absent. Aucune clé ni valeur n'est loggée.
+  #
   # Retourne le nombre de variables effectivement posées.
-  def self.load(path : String = ".env", overwrite : Bool = false) : Int32
-    return 0 unless File.exists?(path)
+  def self.load(path : String = ".env", overwrite : Bool = false, quiet : Bool = false) : Int32
+    abs = File.expand_path(path)
+    unless File.exists?(path)
+      Log.warn { ".env introuvable au chemin demandé : #{abs}" } unless quiet
+      return 0
+    end
 
     count = 0
+    skipped = 0
     parse(File.read(path)).each do |key, value|
-      next if !overwrite && ENV.has_key?(key)
+      if !overwrite && ENV.has_key?(key)
+        skipped += 1
+        next
+      end
       ENV[key] = value
       count += 1
     end
+    Log.info { ".env chargé depuis #{abs} : #{count} variable(s) posée(s), #{skipped} ignorée(s) (déjà dans ENV)" } unless quiet
     count
   end
 
