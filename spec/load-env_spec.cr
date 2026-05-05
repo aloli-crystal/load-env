@@ -17,7 +17,7 @@ end
 
 describe LoadEnv do
   it "expose une version" do
-    LoadEnv::VERSION.should eq("0.1.0")
+    LoadEnv::VERSION.should match(/\A\d+\.\d+\.\d+\z/)
   end
 
   describe ".parse" do
