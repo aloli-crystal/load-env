@@ -1,5 +1,5 @@
 name: load-env
-version: 0.2.2
+version: 0.2.3
 
 description: >
   Chargeur `.env` Crystal pur (zéro dépendance externe). Parse les formats
